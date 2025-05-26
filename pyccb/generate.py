@@ -9,6 +9,8 @@ def create_expr(val):
         if type(val.value) == str:
             return f'"{val.value}"'
         return f"{val.value}"
+    elif type(val) == ast.Name:
+        return f"${{{val.id}}}"
     else:
         utils.error(f"unknown value type '{type(val).__name__}'")
     return ""
@@ -29,6 +31,8 @@ def create_statement(command: ast.stmt) -> str:
         return (
             f"{command.func.id} {' '.join([create_expr(arg) for arg in command.args])}"
         )
+    elif type(command) == ast.Assign:
+        return f"{command.targets[0].id}={create_expr(command.value)}"
     else:
         utils.error(f"unknown command '{type(command).__name__}'")
     return ""
