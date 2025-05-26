@@ -1,33 +1,38 @@
 # Generates a shell script from an AST
 # Core Bash generator
+import ast
 from . import utils
 
 
-def create_val(val):
-    if 0:
-        pass
+def create_expr(val):
+    if type(val) == ast.Constant:
+        if type(val.value) == str:
+            return f'"{val.value}"'
+        return f"{val.value}"
     else:
         utils.error(f"unknown value type '{type(val).__name__}'")
+    return ""
 
 
-def create_block(block: list, indent=0):
+def create_block(block: list[ast.stmt], indent=0) -> str:
     compiled = ""
     for command in block:
-        compiled += ("   " * indent) + create_command(command) + "\n"
+        compiled += ("   " * indent) + create_statement(command) + "\n"
 
     return compiled
 
 
-def create_command(command):
-    compiled = ""
-    if 0:
-        pass
+def create_statement(command: ast.stmt) -> str:
+    if type(command) == ast.Expr:
+        return create_statement(command.value)
+    elif type(command) == ast.Call:
+        return (
+            f"{command.func.id} {' '.join([create_expr(arg) for arg in command.args])}"
+        )
     else:
         utils.error(f"unknown command '{type(command).__name__}'")
-
-    return compiled
-
-
-def generate(program) -> str:
     return ""
-    # return create_block(program)
+
+
+def generate(program: ast.Module) -> str:
+    return create_block(program.body)
