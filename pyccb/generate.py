@@ -29,7 +29,8 @@ def create_expr(val):
         # ||: OR
         # Support for compound expressions
         left = create_expr(val.left)
-        if left.isnumeric():
+        right = create_expr(val.comparators[0])
+        if left.isnumeric() or right.isnumeric():
             if type(val.ops[0]) == ast.Lt:
                 op = "-lt"
             elif type(val.ops[0]) == ast.LtE:
