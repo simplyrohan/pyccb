@@ -11,6 +11,16 @@ def create_expr(val):
         return f"{val.value}"
     elif type(val) == ast.Name:
         return f"${{{val.id}}}"
+    elif type(val) == ast.BinOp:
+        if type(val.op) == ast.Add:
+            op = "+"
+        elif type(val.op) == ast.Sub:
+            op = "-"
+        elif type(val.op) == ast.Mult:
+            op = "*"
+        elif type(val.op) == ast.Div:
+            op = "/"
+        return f"$(( {create_expr(val.left)} {op} {create_expr(val.right)} ))"
     else:
         utils.error(f"unknown value type '{type(val).__name__}'")
     return ""
