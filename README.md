@@ -9,6 +9,10 @@ Python Compiler Collection for Bash
 
 **Installation:**
 ```bash
+pip install pyccb
+```
+or
+```bash
 # In the cloned repository
 pip install -e .
 ```
