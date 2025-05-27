@@ -91,6 +91,10 @@ def create_statement(command: ast.stmt) -> str:
     elif type(command) == ast.While:
         # command.test
         return f"while [ {create_expr(command.test)} ]\ndo\n" + create_block(command.body, 1) + "done"
+    elif type(command) == ast.FunctionDef:
+        return f"{command.name} () {{\n" + create_block(command.body, 1) + "}"
+    elif type(command) == ast.Return:
+        return f"return {create_expr(command.value)}"
     else:
         utils.error(f"unknown command '{type(command).__name__}'")
     return ""
