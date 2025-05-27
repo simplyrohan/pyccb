@@ -21,6 +21,40 @@ def create_expr(val):
         elif type(val.op) == ast.Div:
             op = "/"
         return f"$(( {create_expr(val.left)} {op} {create_expr(val.right)} ))"
+    elif type(val) == ast.Compare:
+        # TODO:
+        # Logical Operators:
+        # !: NOT
+        # &&: AND
+        # ||: OR
+        # Support for compound expressions
+        left = create_expr(val.left)
+        if left.isnumeric():
+            if type(val.ops[0]) == ast.Lt:
+                op = "-lt"
+            elif type(val.ops[0]) == ast.LtE:
+                op = "-le"
+
+            elif type(val.ops[0]) == ast.Gt:
+                op = "-gt"
+            elif type(val.ops[0]) == ast.GtE:
+                op = "-ge"
+
+            elif type(val.ops[0]) == ast.Eq:
+                op = "-eq"
+            elif type(val.ops[0]) == ast.NotEq:
+                op = "-ne"
+        else:
+            if type(val.ops[0]) == ast.Lt:
+                op = "<"
+            elif type(val.ops[0]) == ast.Gt:
+                op = ">"
+
+            elif type(val.ops[0]) == ast.Eq:
+                op = "=="
+            elif type(val.ops[0]) == ast.NotEq:
+                op = "!="
+        return f"{left} {op} {create_expr(val.comparators[0])}"
     else:
         utils.error(f"unknown value type '{type(val).__name__}'")
     return ""
@@ -43,6 +77,16 @@ def create_statement(command: ast.stmt) -> str:
         )
     elif type(command) == ast.Assign:
         return f"{command.targets[0].id}={create_expr(command.value)}"
+    elif type(command) == ast.If:
+        else_ = ""
+        if command.orelse:
+            else_ = "else\n" + create_block(command.orelse, 1)
+        return (
+            f"if [ {create_expr(command.test)} ]; then\n"
+            + create_block(command.body, 1)
+            + else_
+            + "fi"
+        )
     else:
         utils.error(f"unknown command '{type(command).__name__}'")
     return ""
