@@ -4,8 +4,10 @@ import ast
 from . import utils
 
 
-def create_expr(val):
-    if type(val) == ast.Constant:
+def create_expr(val, wrap=True):
+    if type(val) == ast.Name:
+        return val.id
+    elif type(val) == ast.Constant:
         if type(val.value) == str:
             return f'"{val.value}"'
         return f"{val.value}"
@@ -56,6 +58,14 @@ def create_expr(val):
             elif type(val.ops[0]) == ast.NotEq:
                 op = "!="
         return f"{left} {op} {create_expr(val.comparators[0])}"
+    elif type(val) == ast.List:
+        return f"({' '.join([create_expr(e) for e in val.elts])})"
+    elif type(val) == ast.Subscript:
+        return (
+            ("${" if wrap else "")
+            + f"{val.value.id}[{val.slice.value}]"
+            + ("}" if wrap else "")
+        )
     else:
         utils.error(f"unknown value type '{type(val).__name__}'")
     return ""
@@ -77,7 +87,7 @@ def create_statement(command: ast.stmt) -> str:
             f"{command.func.id} {' '.join([create_expr(arg) for arg in command.args])}"
         )
     elif type(command) == ast.Assign:
-        return f"{command.targets[0].id}={create_expr(command.value)}"
+        return f"{create_expr(command.targets[0], False)}={create_expr(command.value)}"
     elif type(command) == ast.If:
         else_ = ""
         if command.orelse:
@@ -90,7 +100,11 @@ def create_statement(command: ast.stmt) -> str:
         )
     elif type(command) == ast.While:
         # command.test
-        return f"while [ {create_expr(command.test)} ]\ndo\n" + create_block(command.body, 1) + "done"
+        return (
+            f"while [ {create_expr(command.test)} ]\ndo\n"
+            + create_block(command.body, 1)
+            + "done"
+        )
     elif type(command) == ast.FunctionDef:
         return f"{command.name} () {{\n" + create_block(command.body, 1) + "}"
     elif type(command) == ast.Return:
