@@ -9,11 +9,26 @@ def create_expr(val: ast.expr, wrap=True):
         return ("$" if wrap else "") + val.id
     elif type(val) == ast.Constant:
         if type(val.value) == str:
-            return f'{val.value}'
+            return f"{val.value}"
         return f"{val.value}"
     elif type(val) == ast.Name:
         return f"${{{val.id}}}"
+    elif type(val) == ast.UnaryOp:
+        if type(val.op) == ast.Invert:
+            op = "~"
+        else:
+            utils.error(f"unknown unary operator type '{type(val.op).__name__}'")
+        
+        return f"$(({op}{create_expr(val.operand)}))"
     elif type(val) == ast.BinOp:
+        """
+            extraflags = extraflags & ~4
+            mip = mip | (1 << 7)
+        else:
+            mip = mip & (~(1 << 7))
+
+        if extraflags & 4:
+            return 1"""
         if type(val.op) == ast.Add:
             op = "+"
         elif type(val.op) == ast.Sub:
@@ -22,7 +37,26 @@ def create_expr(val: ast.expr, wrap=True):
             op = "*"
         elif type(val.op) == ast.Div:
             op = "/"
+        elif type(val.op) == ast.BitAnd:
+            op = "&"
+        elif type(val.op) == ast.BitOr:
+            op = "|"
+        elif type(val.op) == ast.LShift:
+            op = "<<"
+        elif type(val.op) == ast.RShift:
+            op = ">>"
+        else:
+            utils.error(f"unknown operator type '{type(val.op).__name__}'")
         return f"$(( {create_expr(val.left)} {op} {create_expr(val.right)} ))"
+    elif type(val) == ast.BoolOp:
+        if type(val.op) == ast.And:
+            op = "&&"
+        elif type(val.op) == ast.Or:
+            op = "||"
+        else:
+            utils.error(f"unknown boolean operator type '{type(val.op).__name__}'")
+
+        return f"$(( {create_expr(val.values[0])} {op} {create_expr(val.values[1])} ))"
     elif type(val) == ast.Compare:
         # TODO:
         # Logical Operators:
