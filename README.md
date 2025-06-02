@@ -29,7 +29,7 @@ pyccb examples/helloworld.py -o helloworld.sh
 ```py
 import pyccb
 
-pyccb.compile("print ('Hello World')")
+pyccb.compile("print ('\"Hello World\"')")
 ```
 
 ## Features + Guide
@@ -45,7 +45,7 @@ pyccb.compile("print ('Hello World')")
 
 To make your program useful, you can call commands as normal functions. eg.
 ```py
-echo("Hello World")
+echo('"Hello World"')
 ```
 
 See `examples/` for more usage examples. You can compile all the examples by running `./tests/all.sh`.

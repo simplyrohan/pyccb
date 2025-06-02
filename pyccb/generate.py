@@ -4,12 +4,12 @@ import ast
 from . import utils
 
 
-def create_expr(val, wrap=True):
+def create_expr(val: ast.expr, wrap=True):
     if type(val) == ast.Name:
-        return val.id
+        return ("$" if wrap else "") + val.id
     elif type(val) == ast.Constant:
         if type(val.value) == str:
-            return f'"{val.value}"'
+            return f'{val.value}'
         return f"{val.value}"
     elif type(val) == ast.Name:
         return f"${{{val.id}}}"
@@ -30,8 +30,8 @@ def create_expr(val, wrap=True):
         # &&: AND
         # ||: OR
         # Support for compound expressions
-        left = create_expr(val.left)
-        right = create_expr(val.comparators[0])
+        left = create_expr(val.left, True)
+        right = create_expr(val.comparators[0], True)
         if left.isnumeric() or right.isnumeric():
             if type(val.ops[0]) == ast.Lt:
                 op = "-lt"

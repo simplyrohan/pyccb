@@ -1,5 +1,5 @@
 def my_func():
-    echo("feeling funky")
+    echo('"feeling funky"')
     return 1
 
 

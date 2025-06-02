@@ -23,6 +23,6 @@ def error(msg: str, line=None):
     if line != None:
         location = f"{file_name}:{line + 1}"
     print(
-        f"{BOLD}{location + ": " if location else ""}{COLOR_TEXT(r, g, b)}error: {CLEAR}{BOLD}{msg}{CLEAR}"
+        f"{BOLD}{location + ': ' if location else ''}{COLOR_TEXT(r, g, b)}error: {CLEAR}{BOLD}{msg}{CLEAR}"
     )
     exit(1)
