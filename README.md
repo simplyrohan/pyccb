@@ -42,6 +42,7 @@ pyccb.compile("print ('\"Hello World\"')")
 - Basic arithmatic (+-*/)
 - Conditionals + `if` statements
 - `while` Loops
+- Lists
 
 To make your program useful, you can call commands as normal functions. eg.
 ```py
